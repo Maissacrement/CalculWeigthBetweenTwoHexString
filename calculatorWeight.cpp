@@ -42,7 +42,7 @@ string entry(string chaine) {
         kor="";
     }
     
-    return "[" + std::to_string(resError) + ",'" + resl + "', '" + xored + "']";
+    return std::to_string(resError) + ",'" + resl + "', '" + xored;
 }
 
 string getMatchingCase(string id, string dict)
