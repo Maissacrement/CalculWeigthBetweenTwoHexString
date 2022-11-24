@@ -5,7 +5,7 @@
 using namespace std;
 namespace py = pybind11;
 
-string base[] = { "746370", "207564" };
+string base[] = { "474554202f20485454500a", "504f5354202f200a" };
 
 string entry(string chaine) {
     string matchingID(chaine);
@@ -30,7 +30,7 @@ string entry(string chaine) {
             k=0;
             while ( (r^k) <= b || abs((r^k) - b) >= b ) { k=1+k; }
             r=r^k;
-            kor+="|"+std::to_string(k)+","+std::to_string(-(b-r));
+            kor+=std::to_string(k)+";"+std::to_string(-(b-r))+";";
             weight+=abs(b - r);
         }
         if (resError == -1 || resError > weight) {
@@ -42,7 +42,7 @@ string entry(string chaine) {
         kor="";
     }
     
-    return std::to_string(resError) + ",'" + resl + "', '" + xored;
+    return std::to_string(resError) + "," + resl + "," + xored;
 }
 
 string getMatchingCase(string id, string dict)
