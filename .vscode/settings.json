@@ -58,6 +58,9 @@
         "thread": "cpp",
         "typeinfo": "cpp",
         "variant": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "forward_list": "cpp",
+        "unordered_set": "cpp",
+        "typeindex": "cpp"
     }
 }

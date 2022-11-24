@@ -13,6 +13,10 @@ string entry(string chaine) {
     long weight=0;
     long resError=-1;
     string resl="";
+    int k=0;
+    string xored="";
+    string kor="";
+    
     for (size_t j = 0; j < size(base); j++) {
         for (size_t i = 0; i < matchingID.length() / 2; i++)
         {
@@ -20,17 +24,25 @@ string entry(string chaine) {
             hex+=base[j][i*2+1];
             mt=matchingID[i*2];
             mt+=matchingID[i*2+1];
-            
-            weight+=abs(strtol(hex.c_str (), NULL, 16) - strtol(mt.c_str (), NULL, 16) + 0);
+
+            long r=strtol(mt.c_str (), NULL, 16);
+            long b=strtol(hex.c_str (), NULL, 16);
+            k=0;
+            while ( (r^k) <= b || abs((r^k) - b) >= b ) { k=1+k; }
+            r=r^k;
+            kor+="|"+std::to_string(k)+","+std::to_string(-(b-r));
+            weight+=abs(b - r);
         }
         if (resError == -1 || resError > weight) {
             resError=weight;
             resl=base[j];
+            xored=kor;
         }
         weight=0;
+        kor="";
     }
     
-    return "[" + std::to_string(resError) + ",'" + resl + "']";
+    return "[" + std::to_string(resError) + ",'" + resl + "', '" + xored + "']";
 }
 
 string getMatchingCase(string id, string dict)
