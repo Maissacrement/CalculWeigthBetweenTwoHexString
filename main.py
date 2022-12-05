@@ -14,7 +14,7 @@ print(len(ws))
 for i in range(len(ws)):
     if(i + 6 > len(ws)): break
     mpkg=ws[i:i+6]
-    r=getEntry(mpkg).split(',')
+    r=getEntry(mpkg, ['e55']).split(',')
     xored=r[2].split(';')[:-1]
     
     for j in range(len(xored)//2):
