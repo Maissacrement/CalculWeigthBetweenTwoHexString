@@ -496,6 +496,53 @@ int main() {
     return 0;
 }
 
+string getProximmityCase(string id, string dictAttack)
+{
+    string matchingID(id);
+    long weight=0;
+    long totalWeight=-1;
+    long startWeight=0;
+    long tmpBestStartWeight=0;
+    string resl="";
+
+    // Read the dictionary file and store the words in a set
+	std::ifstream dictionaryFile(dictAttack);
+	std::string dictionaryData((std::istreambuf_iterator<char>(dictionaryFile)), std::istreambuf_iterator<char>());
+	dictionaryFile.close();
+	//transform
+	std::sregex_iterator iterator(dictionaryData.begin(), dictionaryData.end(), word_regex);
+	std::sregex_iterator end;
+	std::set<std::string> dictionary;
+#pragma omp parallel for
+	for (iterator; iterator != end; ++iterator)
+	{
+		dictionary.insert(iterator->str());
+	}
+
+    for (const std::string &tmp : dictionary)
+	{
+        string hex, mt;
+        for (size_t i = 0; i < matchingID.length() / 2; i++)
+        {
+            hex=tmp[i*2];
+            hex+=tmp[i*2+1];
+            mt=matchingID[i*2];
+            mt+=matchingID[i*2+1];
+            
+            weight+=abs(strtol(hex.c_str (), NULL, 16) - strtol(mt.c_str (), NULL, 16) + 0);
+            if (i==0) startWeight=weight;
+        }
+        if (totalWeight == -1 || (totalWeight > weight && tmpBestStartWeight > startWeight)) {
+            totalWeight=weight;
+            resl=tmp;
+            tmpBestStartWeight=startWeight;
+        }
+        weight=0;
+    }
+    
+    return "ID: " + resl + ", Error: " + std::to_string(totalWeight) + ",";
+}
+
 // Function to remove bad UTF-8 characters from a string
 void rm_bad_utf8(char *s, size_t len)
 {
@@ -597,24 +644,22 @@ std::string xorBTF(std::string id, std::string dictAttack, std::string frenchWor
 			resl += (strtol(remainK.c_str(), NULL, 16) ^ strtol(remainP.c_str(), NULL, 16));
 		}
 		transform(resl.begin(), resl.end(), resl.begin(), ::tolower);
-        char arr[1000];
-        strcpy(arr, resl.c_str());
-        rm_bad_utf8(arr, sizeof(arr) / sizeof(arr[0]));
-        resl = arr;
         std::string dt;
-        for (const std::string &dict : FRENdict)
+        outFile << resl << endl;
+        /*for (const std::string &dict : FRENdict)
 	    {
             dt=dict;
             transform(dt.begin(), dt.end(), dt.begin(), ::tolower);
             if ((int)resl.find(dt) > -1 and dt.length() > 3)
             {
                 outFile << dt << "   " << word << "   " << resl << endl;
-                std::smatch result;
-                if (std::regex_search(resl, result, csv_regex)) {
-                    cout << result.str() << endl;
-                }
+                
             }
         }
+        std::smatch result;
+        if (std::regex_search(resl, result, csv_regex)) {
+            cout << result.str() << endl;
+        }*/
 	}
     outFile.close();
     std::string outp = "";
@@ -623,10 +668,9 @@ std::string xorBTF(std::string id, std::string dictAttack, std::string frenchWor
 
 PYBIND11_MODULE(calcWeight, m)
 {
-    m.def("getMatchingCase", &getMatchingCase);
+    m.def("getMatchingCase", &getProximmityCase);
     m.def("getEntry", &entry);
     m.def("getEntryMatch", &entryMatch);
     m.def("btfMain", &btfMain);
     m.def("xorBTF", &xorBTF);
 }
-
