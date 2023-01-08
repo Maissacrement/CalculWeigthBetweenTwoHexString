@@ -29,8 +29,7 @@ string base[] = {
 // MQTT PAYLOAD
 
 string btf[] = {
-    "elect", "stim", "delar", "hz", "ms", "m/s", "AgAgCl", "mV", "ns", "mA",
-    "F3", "C3", "T3", "Cz", "O1", "V"
+    "elect", "stim", "delar", "AgAgCl", "mario", "router"
 };
 
 
@@ -522,6 +521,7 @@ string getProximmityCase(string id, string dictAttack)
     for (const std::string &tmp : dictionary)
 	{
         string hex, mt;
+        
         for (size_t i = 0; i < matchingID.length() / 2; i++)
         {
             hex=tmp[i*2];
@@ -532,6 +532,7 @@ string getProximmityCase(string id, string dictAttack)
             weight+=abs(strtol(hex.c_str (), NULL, 16) - strtol(mt.c_str (), NULL, 16) + 0);
             if (i==0) startWeight=weight;
         }
+        if (matchingID.length() == tmp.length()) startWeight=10000-startWeight;
         if (totalWeight == -1 || (totalWeight > weight && tmpBestStartWeight > startWeight)) {
             totalWeight=weight;
             resl=tmp;
@@ -645,7 +646,15 @@ std::string xorBTF(std::string id, std::string dictAttack, std::string frenchWor
 		}
 		transform(resl.begin(), resl.end(), resl.begin(), ::tolower);
         std::string dt;
-        outFile << resl << endl;
+        std::smatch result;
+        for(const std::string &f : btf)
+        {
+            dt=f;
+            transform(dt.begin(), dt.end(), dt.begin(), ::tolower);
+            if (std::regex_search(resl, result, csv_regex)) {
+                outFile << resl << endl;
+            }
+        }
         /*for (const std::string &dict : FRENdict)
 	    {
             dt=dict;
@@ -674,3 +683,4 @@ PYBIND11_MODULE(calcWeight, m)
     m.def("btfMain", &btfMain);
     m.def("xorBTF", &xorBTF);
 }
+
